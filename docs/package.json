@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "serve": "gitbook serve",
-    "build": "gitbook build"
+    "build": "gitbook build ./ docs"
   },
   "author": "",
   "license": "ISC"
