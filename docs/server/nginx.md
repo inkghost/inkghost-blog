@@ -22,6 +22,8 @@ nginx
 
 此时，访问 http://<您的域名或 IP> 可以看到 Nginx 的测试页面
 
+![nginx_index](img/nginx_index.png)
+
 > 如果无法访问，请重试用 nginx -s reload 命令重启 Nginx
 
 ## 配置静态服务器访问路径
