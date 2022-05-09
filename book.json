@@ -1,0 +1,5 @@
+{
+  "title": "inkghost blog",
+  "author": "inkghost",
+  "plugins": ["-lunr", "-search", "search-pro", "back-to-top-button", "code"]
+}
