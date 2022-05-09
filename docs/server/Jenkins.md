@@ -147,3 +147,50 @@ yarn config get registry
 # 退出docker镜像
 exit
 ```
+
+## 使用 SSH 协议集成 Git 仓库源
+
+在这步中，我们将使用 Jenkins 集成外部 Git 仓库，实现对真实代码的拉取和构建。
+
+### 服务器安装 git
+
+使用 `yum -y install git` 指令安装 git，安装后使用 `git --verison` 查看是否安装成功。
+
+### 生成公钥私钥
+
+首先，我们先来配置公钥和私钥。这是 Jenkins 访问 Git 私有库的常用认证方式。我们可以使用 `ssh-keygen` 命令即可生成公钥私钥。
+
+```shell
+ssh-keygen -t rsa -C "269629082@qq.com"
+```
+
+执行后，会遇到第一步骤：`Enter file in which to save the key` 。这一步是询问你要将公钥私钥文件放在哪里。默认是放在 `~/.ssh/id_rsa 下`，当然也可以选择输入你自己的路径。结束后，你会得到两个文件。分别是 `id_rsa` 和 `id_rsa.pub`。其中，`id_rsa` 是私钥文件，`id_rsa.pub` 是对应的公钥文件。我们需要在 Git 端配置公钥，在 Jenkins 端使用私钥与 Git 进行身份校验。
+
+### 在 Gitee 中配置公钥
+
+在 Gitee 中添加 SSH 公钥，其中的公钥为刚才生成的 `id_rsa.pub` 文件，可以使用 `cat ~/.ssh/id_rsa.pub` 进行查看。
+
+![Gitee公钥配置](img/jenkins_pub.png)
+
+### 在 Jenkins 配置私钥
+
+在 Jenkins 中，私钥/密码等认证信息都是以“凭证”的方式管理的，所以可以做到全局都通用。我们可以在配置任务时，来添加一个自己的“凭证”。点击项目的“配置”，依次找到 “源码管理” => “Git” => “Repositories”。
+
+![Jenkins私钥配置](img/jenkins_pri.png)
+
+`Repository URL` 则是我们的仓库地址， SSH 地址格式为 `git@gitee.com:xxx/xxx.git`。
+
+`Credentials` 是我们选择认证凭证的地方。我们可以点击右侧 “添加” => “Jenkins” 按钮添加一条新的凭证认证信息。点击后会打开一个弹窗，这是 Jenkins 添加凭证的弹窗。选择类型中的 `SSH Username with private key` 这一项。接着填写信息即可：
+
+`ID`：这条认证凭证在 Jenkins 中的名称是什么
+`描述`：描述信息
+`Username`：用户名（邮箱）
+`Private Key`：这里则是我们填写私钥的地方
+
+在命令行窗口，查看私钥文件内容，并复制它 `cat ~/.ssh/id_rsa`。点击 Add 按钮，将私钥文件内所有文件内容全部复制过去（包含开头的 BEGIN OPENSSH PRIVATE KEY 和结尾的 END OPENSSH PRIVATE KEY）接着点击添加按钮，保存凭证。
+
+![Jenkins凭证](img/jenkins_credentials.png)
+
+选择凭证后若无其他提示则说明身份校验成功。
+
+![Jenkins校验](img/jenkins_credentials_res.png)
