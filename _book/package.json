@@ -1,0 +1,12 @@
+{
+  "name": "inkghost-blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "gitbook serve",
+    "build": "gitbook build ./ docs"
+  },
+  "author": "",
+  "license": "ISC"
+}
