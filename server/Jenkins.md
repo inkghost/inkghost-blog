@@ -234,3 +234,59 @@ docker build -t imagename:version .
 ```shell
 touch snappy-react.sh
 ```
+
+并且修改脚本文件为我们所需要的内容(Jenkins 会自动更新仓库)：
+
+```shell
+#!/bin/sh -l
+
+cd ./public
+yarn
+yarn build
+docker build -t snappy-react .
+docker stop snappy-react
+docker rm snappy-react
+docker run --name=snappy-react -d -p 3000:80 snappy-react
+```
+
+最后只需在 Jenkins 端配置下要执行的 Shell 脚本即可。找到项目的配置，依次找到“构建” => “Execute shell”。输入以下脚本：
+
+```shell
+sh /data/jenkins/snappy-react.sh
+```
+
+## 自动执行任务
+
+### 安装插件
+
+安装 `Generic Webhook Trigger Plugin` 插件（系统管理-插件管理-可用插件-搜索 `Generic Webhook`）。
+
+### 添加触发器
+
+`Generic Webhook Trigger Plugin` 插件功能很强大，可以根据不同的触发参数触发不同的构建操作。
+
+![Jenkins构建触发器](img/jenkins_generic_webhook.png)
+
+### Git 仓库配置钩子
+
+![Git Webhook](img/git_webhook.png)
+
+上图中的 URL 格式为 `http://<User ID>:<API Token>@<Jenkins IP 地址>:端口/generic-webhook-trigger/invoke`
+
+- 获取 `User ID`
+
+Jenkins 左侧栏点击“系统管理”=>“管理用户”以查看。
+
+![Jenkins管理用户](img/jenkins_usermanage.png)
+
+- 获取 `API Token`
+
+接下来点击工具图标，进入详情界面后找到 API Token 以生成 Token。
+
+![Jenkins API Token](img/jenkins_api_token.png)
+
+- WebHook 密码
+
+即 Jenkins 登录密码。
+
+点击提交即可完成配置，我们可以点击“测试”按钮以测试钩子是否生效。
