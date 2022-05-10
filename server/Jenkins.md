@@ -194,3 +194,43 @@ ssh-keygen -t rsa -C "269629082@qq.com"
 选择凭证后若无其他提示则说明身份校验成功。
 
 ![Jenkins校验](img/jenkins_credentials_res.png)
+
+## 构建镜像
+
+在我们将环境准备就绪后，就可以开始构建镜像了。不过在此之前我们需要先准备个 DockerFile 。
+
+### 编写 Dockerfile
+
+Dockerfile 是一个 Docker 镜像的基础描述文件，里面描述了生成一个镜像所需要的执行步骤。我们也可以自定义一份 Dockerfile 来创建一个自己的镜像。
+
+例如下面的步骤，使用 Dockerfile 可描述为：
+
+1. 基于 nginx:1.15 镜像做底座。
+2. 拷贝相对路径 build 文件夹内的文件，到镜像内 /etc/nginx/html 文件夹。
+3. 拷贝相对路径下 default.conf 文件，到镜像内 /etc/nginx/conf.d 文件夹。
+4. 设置工作目录为镜像内的 /etc/nginx/html
+
+```shell
+FROM nginx:1.15-alpine
+COPY build /etc/nginx/html
+COPY default.conf /etc/nginx/conf.d
+WORKDIR /etc/nginx
+```
+
+编写完成后我们只需要使用 `docker build` 命令就可以构建一个镜像了：
+
+```shell
+docker build -t imagename:version .
+```
+
+标签格式为 `镜像名:版本 .` ：声明要寻找 dockerfile 文件的路径。 `.` 代表当前路径下寻找，默认文件名为 Dockerfile。我们只需要在自己的代码中添加相关文件并提交至代码库中即可。
+
+## Jenkins 端配置
+
+为便于代码更新，我们需要在服务器先 `clone` 代码源。
+
+在代码源和 `DockerFile` 准备就绪后。在服务器的 `/data/jenkins` 目录下新建一个 `snappy-react.sh` 脚本文件。
+
+```shell
+touch snappy-react.sh
+```
